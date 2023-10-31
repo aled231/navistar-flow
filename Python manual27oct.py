@@ -1,7 +1,5 @@
 import time
 def Manualmode(): #This is the function for starting the test and asking at what flow rates to perform the test
-    #pwm = HardwarePWM(pwm_channel=0, hz=2_000)
-    #pwm.start(5)
     Flow_List = [] #Array that will store flow rates to be tested
     Min_List = [] #array for time for each flow rate
     Sec_List= []
@@ -31,6 +29,9 @@ def Manualmode(): #This is the function for starting the test and asking at what
     print(Flow_List, Min_List, Sec_List)
     Length = len(Flow_List)
     while Length > 0:
+        pwm = HardwarePWM(pwm_channel=0, hz=2_000)
+        pwm.start(5)
+        time.sleep(20)
         Pump_flow = Flow_List[0]
         Test_min = Min_List[0]
         Test_sec = Sec_List[0]
@@ -38,8 +39,8 @@ def Manualmode(): #This is the function for starting the test and asking at what
         Total_sec = min2sec + Test_sec
         print(Total_sec)
         Duty_cycle =(1-((((Pump_flow/16)*8)+2)/12))
-        #pwm.change_duty_cycle(Duty_cycle)
-        time.sleep(30)
+        pwm.change_duty_cycle(Duty_cycle)
+        time.sleep(20)
         for s in range(Total_sec, 0, -1):
             seconds = s % 60
             minutes = int(s / 60) % 60
