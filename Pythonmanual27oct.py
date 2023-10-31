@@ -3,6 +3,8 @@ def Manualmode(): #This is the function for starting the test and asking at what
     Flow_List = [] #Array that will store flow rates to be tested
     Min_List = [] #array for time for each flow rate
     Sec_List= []
+    pwm = HardwarePWM(pwm_channel=0, hz=2_000)
+    pwm.start(5)
     while True:
         GPM = int(input('Enter the flow rate in GPM to be tested: ')) #User inputs GPM wanted for test
         if (GPM <= 16 and GPM>0):
@@ -29,18 +31,15 @@ def Manualmode(): #This is the function for starting the test and asking at what
     print(Flow_List, Min_List, Sec_List)
     Length = len(Flow_List)
     while Length > 0:
-        pwm = HardwarePWM(pwm_channel=0, hz=2_000)
-        pwm.start(5)
-        time.sleep(20)
         Pump_flow = Flow_List[0]
         Test_min = Min_List[0]
         Test_sec = Sec_List[0]
         min2sec = Test_min*60
         Total_sec = min2sec + Test_sec
         print(Total_sec)
-        Duty_cycle =(1-((((Pump_flow/16)*8)+2)/12))
+        Duty_cycle = 100 * (1-((((Pump_flow/16)*8)+2)/12))
         pwm.change_duty_cycle(Duty_cycle)
-        time.sleep(20)
+        time.sleep(10)#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!change this for valve adjustment waiting
         for s in range(Total_sec, 0, -1):
             seconds = s % 60
             minutes = int(s / 60) % 60
@@ -54,6 +53,8 @@ def Manualmode(): #This is the function for starting the test and asking at what
         Min_List.pop(0)
         Sec_List.pop(0)
         Length += -1
+        return
+    pwm.stop()
     return #returns array to be called in other function
 
 
