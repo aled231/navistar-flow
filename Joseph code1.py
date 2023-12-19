@@ -15,8 +15,8 @@ from datatest3 import generate_excel_file
        
 class FlowRateAppClient:
     def startAutoFunc(self):
-        self.thread = th.Thread(target=self.loop_measure)
         self.is_running=True
+        self.thread = th.Thread(target=self.loop_measure)
         self.thread.start()
         self.Automode()
         
@@ -92,6 +92,47 @@ class FlowRateAppClient:
         self.start_auto.destroy()
         is_measuring=True
         self.root.update()
+        #####testing
+        if self.is_measuring:
+            flowGPIO = 17
+            pi = pigpio.pi()
+            pi.set_mode(flowGPIO, pigpio.INPUT)
+            flowCallback = pi.callback(flowGPIO)
+            pulse_count = 0
+            while True:
+                time.sleep(1)
+                count = flowCallback.tally()
+                self.waterflow = count - pulse_count
+                pulse_count = count
+                #pulses_meter1 = GPIO.input(self.flow_meter1_pin)
+                #pulses_meter2 = GPIO.input(self.flow_meter2_pin)
+
+                #flow_rate_meter1 = pulses_meter1 * 0.1  # Simulated calculation
+                #flow_rate_meter2 = pulses_meter2 * 0.1  # Simulated calculation
+            
+                self.turbinegpm = self.waterflow/165
+            
+                self.flowlabel = Label(text="Flowrate ="f"{self.turbinegpm:01}")
+                self.timelabel.grid(row=2, column=3)
+                self.root.update()
+
+                #self.flow_meter1_values.append(flow_rate_meter1)
+                #self.flow_meter2_values.append(flow_rate_meter2)
+
+                self.flow_rate_label.configure(text=f"Flow Rate Meter 1: {flow_rate_meter1:.2f} GPM")#, Flow Rate Meter 2: {flow_rate_meter2:.2f} GPM")
+
+                #self.flow_rate_history.append(flow_rate_meter1)
+                #self.time_intervals.append(len(self.flow_rate_history) * 2)  # 2-second intervals
+
+            #timestamp = datetime.datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
+            #filename = f"flowMeterData_{timestamp}.txt"
+            #self.write_to_file(filename, flow_rate_meter1)#, flow_rate_meter2)
+
+            #self.root.after(2000, self.measure_flow_rate)
+                
+                
+                
+                #####testing
         pwm = HardwarePWM(pwm_channel=0, hz=2_000)
         pwm.start(71)
         time.sleep(30)#waiting for valve, we can change this time based on testing
